@@ -72,7 +72,7 @@ class Graph {
                 ctx.moveTo(p.x, p.y)
                 ctx.lineTo(p2.x, p2.y)
                 ctx.closePath()
-                ctx.strokeStyle = `rgb(200,200,200,${1 - d / this.maxDis + 0.2})`
+                ctx.strokeStyle = `rgb(200,200,200,${1 - d / this.maxDis})`
                 ctx.stroke()
             }
         }

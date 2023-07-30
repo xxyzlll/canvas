@@ -1,5 +1,6 @@
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
+const colorSelect = document.getElementById('color')
 init()
 function init() {
     canvas.width = 600 * devicePixelRatio;
@@ -62,17 +63,15 @@ function getShape(x, y) {
 }
 
 canvas.onmousedown = (e) => {
-    const rect = canvas.getBoundingClientRect()
-    const x = e.clientX - rect.left,
-        y = e.clientY - rect.top
+    const { offsetX, offsetY } = e
 
-    const shape = getShape(x, y)
+    const shape = getShape(offsetX, offsetY)
     if (shape) {
         const { startX, startY, endX, endY } = shape
 
-        window.onmousemove = (e) => {
-            const disX = e.clientX - rect.left - x
-            const disY = e.clientY - rect.top - y
+        canvas.onmousemove = (e) => {
+            const disX = e.offsetX - offsetX
+            const disY = e.offsetY - offsetY
 
             shape.startX = startX + disX
             shape.startY = startY + disY
@@ -81,23 +80,23 @@ canvas.onmousedown = (e) => {
             shape.endY = endY + disY
         }
     } else {
-        const shape = new Rectangle('pink', x, y)
+        const shape = new Rectangle(colorSelect.value, offsetX, offsetY)
         shapes.push(shape)
 
-        window.onmousemove = (e) => {
-            shape.endX = e.clientX - rect.left
-            shape.endY = e.clientY - rect.top
+        canvas.onmousemove = (e) => {
+            shape.endX = e.offsetX
+            shape.endY = e.offsetY
         }
     }
 }
 
 canvas.onmouseup = () => {
-    window.onmousemove = null
+    canvas.onmousemove = null
 }
 
 function draw() {
-    requestAnimationFrame(draw)
     ctx.clearRect(0, 0, canvas.width, canvas.height)
+    requestAnimationFrame(draw)
     for (const shape of shapes) {
         shape.draw()
     }
