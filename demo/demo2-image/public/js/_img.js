@@ -37,12 +37,12 @@ canvas.onclick = (e) => {
         diffChange(x, y - 1)
         diffChange(x + 1, y)
         diffChange(x, y + 1)
+
     }
 
     diffChange(offsetX, offsetY)
     ctx.putImageData(imageData, 0, 0)
 }
-
 /**
  * 通过坐标转换到 imageData 数组下标值
  * @param {*} x 

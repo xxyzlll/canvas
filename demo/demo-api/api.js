@@ -8,18 +8,25 @@ function init() {
 }
 
 function draw() {
-    const context = ctx
+    const data = [10, 60, 40, 50];
+    ctx.fillStyle = "white";
+    for (let i = 0; i < data.length; i++) {
+        let dp = data[i];
+        ctx.translate(100, 0);
 
-    context.font = 'bold 24px Arial';
-    context.fillStyle = 'blue';
-    context.textAlign = 'center';
-    context.fillText('Hello, Canvas', canvas.width / 2, canvas.height / 2);
-    // drawLine()
-    // drawRectByLine()
-    // drawRectByRect()
-    // drawArc()
-    // drawText()
+        if (i === 2) {
+            const rads = (30 * Math.PI * 2.0) / 360.0;
+            ctx.rotate(rads);
+        }
+
+        ctx.fillRect(0, 0, 50, dp);
+    }
 }
+
+
+
+
+
 
 function drawLine() {
     ctx.lineWidth = 5

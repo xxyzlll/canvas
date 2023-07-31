@@ -6,73 +6,95 @@ function getRandom(min, max) {
     return Math.floor(Math.random() * (max + 1 - min) + min)
 }
 
+function init() {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+}
+
 class Point {
+    r = 6
     constructor() {
-        this.r = 6
-        this.x = getRandom(0, canvas.width - this.r / 2)
-        this.y = getRandom(0, canvas.height - this.r / 2)
+        this.x = getRandom(this.r, this.maxBoundaryX)
+        this.y = getRandom(this.r, this.maxBoundaryY)
 
         this.xSpeed = getRandom(-500, 500)
         this.ySpeed = getRandom(-500, 500)
+
         this.lastDrawTime = null
+    }
+    get maxBoundaryY() {
+        return canvas.height - this.r
+    }
+    get maxBoundaryX() {
+        return canvas.width - this.r
     }
     draw() {
         if (this.lastDrawTime) {
+            // 移动
             const duration = (Date.now() - this.lastDrawTime) / 1000
-            let xDis = this.x + this.xSpeed * duration,
-                yDis = this.y + this.ySpeed * duration
+            console.log('duration', duration);
+            let xDis = this.x + duration * this.xSpeed
+            let yDis = this.y + duration * this.ySpeed
 
-            if (xDis > canvas.width - this.r / 2) {
-                xDis = canvas.width - this.r / 2
+            if (xDis >= this.maxBoundaryX) {
+                // 右侧边界
                 this.xSpeed = -this.xSpeed
-            } else if (xDis < 0) {
-                xDis = this.r / 2
+                xDis = this.maxBoundaryX
+            }
+            if (xDis <= 0) {
+                // 右侧边界
                 this.xSpeed = -this.xSpeed
+                xDis = this.r
             }
-            if (yDis > canvas.height - this.r / 2) {
-                yDis = canvas.height - this.r / 2
+
+            if (yDis >= this.maxBoundaryY) {
+                // 右侧边界
                 this.ySpeed = -this.ySpeed
-            } else if (yDis < 0) {
-                yDis = this.r / 2
-                this.ySpeed = -this.ySpeed
+                yDis = this.maxBoundaryY
             }
+            if (yDis <= 0) {
+                // 右侧边界
+                this.ySpeed = -this.ySpeed
+                yDis = this.r
+            }
+
             this.x = xDis
             this.y = yDis
         }
         ctx.beginPath()
-        ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI)
-        ctx.fillStyle = 'rgb(200,200,200)'
+        ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2)
+        ctx.fillStyle = 'white'
         ctx.fill()
+
         this.lastDrawTime = Date.now()
     }
 }
 
-
 class Graph {
-    constructor(pointNum = 150, maxDis = 200) {
-        this.points = new Array(pointNum).fill(0).map(() => new Point())
-        this.maxDis = maxDis
-        this.mousePoint = null;
+    constructor(pointNumber = 30, maxDistance = 500) {
+        this.maxDistance = maxDistance
+        this.pointNumber = pointNumber
+        this.points = new Array(pointNumber).fill().map(() => new Point())
     }
     draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
         requestAnimationFrame(() => {
             this.draw()
         })
-        ctx.clearRect(0, 0, canvas.width, canvas.height)
-        for (let i = 0; i < this.points.length; i++) {
+        for (let i = 0; i < this.pointNumber; i++) {
             const p = this.points[i]
             p.draw()
-            for (let j = i + 1; j < this.points.length; j++) {
+            for (let j = i + 1; j < this.pointNumber; j++) {
                 const p2 = this.points[j]
-                const d = Math.sqrt((p.x - p2.x) ** 2 + (p.y - p2.y) ** 2)
-                if (d > this.maxDis) {
-                    continue
+                const pDis = Math.sqrt(((p2.x - p.x) ** 2) + (p2.y - p.y) ** 2)
+                if (pDis > this.maxDistance) {
+                    continue;
                 }
+                const opacity = 1 - pDis / this.maxDistance + 0.2
                 ctx.beginPath()
                 ctx.moveTo(p.x, p.y)
                 ctx.lineTo(p2.x, p2.y)
-                ctx.closePath()
-                ctx.strokeStyle = `rgb(200,200,200,${1 - d / this.maxDis})`
+                ctx.strokeStyle = `rgba(255,255,255,${opacity})`
                 ctx.stroke()
             }
         }
@@ -81,8 +103,3 @@ class Graph {
 
 const graph = new Graph()
 graph.draw()
-
-function init() {
-    canvas.width = window.innerWidth * devicePixelRatio;
-    canvas.height = window.innerHeight * devicePixelRatio;
-}

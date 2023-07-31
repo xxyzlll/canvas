@@ -7,15 +7,16 @@ function getRandom(min, max) {
 }
 
 function init() {
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
+    canvas.width = window.innerWidth * devicePixelRatio
+    canvas.height = window.innerHeight * devicePixelRatio
 }
+
 
 class Point {
     r = 6
     constructor() {
-        this.x = getRandom(this.r / 2, this.maxBoundaryX)
-        this.y = getRandom(this.r / 2, this.maxBoundaryY)
+        this.x = getRandom(this.r, this.maxBoundaryX)
+        this.y = getRandom(this.r, this.maxBoundaryY)
 
         this.xSpeed = getRandom(-500, 500)
         this.ySpeed = getRandom(-500, 500)
@@ -23,10 +24,10 @@ class Point {
         this.lastDrawTime = null
     }
     get maxBoundaryY() {
-        return canvas.height - this.r / 2
+        return canvas.height - this.r
     }
     get maxBoundaryX() {
-        return canvas.width - this.r / 2
+        return canvas.width - this.r
     }
     draw() {
         if (this.lastDrawTime) {
@@ -44,7 +45,7 @@ class Point {
             if (xDis <= 0) {
                 // 右侧边界
                 this.xSpeed = -this.xSpeed
-                xDis = this.r / 2
+                xDis = this.r
             }
 
             if (yDis >= this.maxBoundaryY) {
@@ -55,7 +56,7 @@ class Point {
             if (yDis <= 0) {
                 // 右侧边界
                 this.ySpeed = -this.ySpeed
-                yDis = this.r / 2
+                yDis = this.r
             }
 
             this.x = xDis
@@ -68,8 +69,13 @@ class Point {
 
         this.lastDrawTime = Date.now()
     }
+    get maxBoundaryY() {
+        return canvas.height - this.r
+    }
+    get maxBoundaryX() {
+        return canvas.width - this.r
+    }
 }
-
 class Graph {
     constructor(pointNumber = 30, maxDistance = 500) {
         this.maxDistance = maxDistance
@@ -77,18 +83,22 @@ class Graph {
         this.points = new Array(pointNumber).fill().map(() => new Point())
     }
     draw() {
+        console.log('draw');
         ctx.clearRect(0, 0, canvas.width, canvas.height)
-        requestAnimationFrame(() => {
-            this.draw()
-        })
+        // requestAnimationFrame(() => {
+        //     this.draw()
+        // })
         for (let i = 0; i < this.pointNumber; i++) {
             const p = this.points[i]
             p.draw()
+
             for (let j = i + 1; j < this.pointNumber; j++) {
                 const p2 = this.points[j]
+
                 const pDis = Math.sqrt(((p2.x - p.x) ** 2) + (p2.y - p.y) ** 2)
+
                 if (pDis > this.maxDistance) {
-                    continue;
+                    // continue;
                 }
                 const opacity = 1 - pDis / this.maxDistance + 0.2
                 ctx.beginPath()
